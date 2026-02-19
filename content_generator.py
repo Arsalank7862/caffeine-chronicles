@@ -121,7 +121,7 @@ def generate_content(content_type: str, history: list[str]) -> str:
 
     response = client.chat.completions.create(
         model=MINIMAX_MODEL,
-        max_tokens=250,
+        max_tokens=2048,
         temperature=0.9,
         messages=[
             {"role": "system", "content": (
