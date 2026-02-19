@@ -30,5 +30,9 @@ YOUTUBE_PRIVACY = "public"  # "public", "unlisted", or "private"
 YOUTUBE_DESCRIPTION_TEMPLATE = (
     "{fact}\n\n"
     "Follow @CaffeineChronicles for your daily dose of coffee knowledge!\n\n"
-    "#shorts #coffee #caffeine #didyouknow #facts #coffeelovers"
+    "#shorts #coffee #caffeine #didyouknow #facts #coffeelovers\n\n"
+    "Music: Sol by Luke Bergs | https://soundcloud.com/bergscloud/\n"
+    "Music promoted by https://www.chosic.com/free-music/all/\n"
+    "Creative Commons CC BY-SA 3.0\n"
+    "https://creativecommons.org/licenses/by-sa/3.0/"
 )
