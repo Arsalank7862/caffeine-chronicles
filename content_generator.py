@@ -99,8 +99,14 @@ def save_state(state: dict) -> None:
 
 def generate_content(content_type: str, history: list[str]) -> str:
     """Call MiniMax API to generate fresh content."""
+    key = MINIMAX_API_KEY
+    # Debug: confirm key is being received (masked)
+    if key:
+        print(f"[DEBUG] API key loaded: {key[:8]}...{key[-4:]} (length={len(key)})")
+    else:
+        print("[DEBUG] WARNING: MINIMAX_API_KEY is empty!")
     client = OpenAI(
-        api_key=MINIMAX_API_KEY,
+        api_key=key,
         base_url=MINIMAX_BASE_URL,
     )
 
