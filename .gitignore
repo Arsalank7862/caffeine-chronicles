@@ -1,0 +1,19 @@
+# Secrets
+client_secrets.json
+youtube_token.json
+.env
+
+# Generated frames (temp)
+output/_frames/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Video outputs (optional — uncomment to keep them out of git)
+# output/*.mp4

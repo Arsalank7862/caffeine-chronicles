@@ -1,0 +1,55 @@
+name: Caffeine Chronicles — Daily Short
+
+on:
+  schedule:
+    # Runs daily at 6:00 PM UTC
+    - cron: "0 18 * * *"
+
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+permissions:
+  contents: write  # needed to commit state.json updates
+
+jobs:
+  daily-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ── Checkout ───────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── System dependencies ────────────────────────────────────────────
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+
+      # ── Python setup ───────────────────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # ── Run pipeline ───────────────────────────────────────────────────
+      - name: Run daily pipeline
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: python pipeline.py
+
+      # ── Persist state ──────────────────────────────────────────────────
+      - name: Commit updated state
+        run: |
+          git config user.name "Caffeine Chronicles Bot"
+          git config user.email "bot@caffeine-chronicles.local"
+          git add state.json output/
+          git diff --cached --quiet || git commit -m "Episode update — $(date -u +%Y-%m-%d)"
+          git push
