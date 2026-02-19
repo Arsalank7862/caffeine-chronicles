@@ -207,19 +207,7 @@ def render_frame(
     inner_w = card_w - 120
     current_y = card_y + 60
 
-    # Episode number
-    ep_font = get_font(30, bold=False)
-    ep_text = f"EPISODE #{episode_data['episode']}"
-    ep_bbox = ep_font.getbbox(ep_text)
-    ep_tw = ep_bbox[2] - ep_bbox[0]
-    text_draw.text(
-        (card_x + (card_w - ep_tw) // 2, current_y),
-        ep_text, font=ep_font,
-        fill=EPISODE_COLOR + (text_alpha,)
-    )
-    current_y += 70
-
-    # Thin divider line
+    # Thin decorative line above header
     div_margin = 100
     text_draw.line(
         [(card_x + div_margin, current_y), (card_x + card_w - div_margin, current_y)],

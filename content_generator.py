@@ -1,25 +1,95 @@
 """
 Caffeine Chronicles — Content Generator
-Picks a daily coffee/caffeine fact (or coffee shop recommendation)
-from a local bank, ensuring no repeats until the bank is exhausted.
+Uses MiniMax M2.5 API to generate fresh, unique content daily.
+Rotates through content categories: facts, myth busters, comparisons,
+and coffee shop recommendations.
 """
 import json
 import random
 from pathlib import Path
+from openai import OpenAI
 
-from config import STATE_FILE, OUTPUT_DIR, COFFEE_SHOP_INTERVAL
-from fact_bank import FACTS, COFFEE_SHOPS
+from config import (
+    STATE_FILE, OUTPUT_DIR, CHANNEL_NAME,
+    MINIMAX_API_KEY, MINIMAX_BASE_URL, MINIMAX_MODEL,
+    CONTENT_ROTATION,
+)
+
+# ── Headers / labels for each content type ───────────────────────────────────
+CONTENT_CONFIG = {
+    "fact": {
+        "header": "DID YOU KNOW?",
+        "title_prefix": "Coffee Fact",
+    },
+    "myth_buster": {
+        "header": "MYTH vs. REALITY",
+        "title_prefix": "Coffee Myth Busted",
+    },
+    "comparison": {
+        "header": "THIS vs. THAT",
+        "title_prefix": "Coffee Showdown",
+    },
+    "coffee_shop": {
+        "header": "COFFEE SHOP SPOTLIGHT",
+        "title_prefix": "Coffee Shop You Need to Visit",
+    },
+}
+
+# ── Prompts per content type ─────────────────────────────────────────────────
+PROMPTS = {
+    "fact": """You are the content writer for "{channel}", a viral YouTube Shorts channel.
+
+Generate a surprising, accurate, and unique coffee or caffeine FACT.
+Make it genuinely mind-blowing — the kind of thing that makes people comment and share.
+Keep it to 1-2 sentences max, suitable for a text card in a short video.
+
+PREVIOUSLY USED (do NOT repeat or closely paraphrase):
+{history}
+
+Reply with ONLY the fact text, nothing else.""",
+
+    "myth_buster": """You are the content writer for "{channel}", a viral YouTube Shorts channel.
+
+Generate a coffee or caffeine MYTH BUSTER. State a common myth people believe,
+then reveal the surprising truth. Format it as two parts:
+"MYTH: [the myth]. TRUTH: [the reality]."
+Keep the total to 2-3 sentences max.
+
+PREVIOUSLY USED (do NOT repeat or closely paraphrase):
+{history}
+
+Reply with ONLY the myth buster text, nothing else.""",
+
+    "comparison": """You are the content writer for "{channel}", a viral YouTube Shorts channel.
+
+Generate an interesting coffee or caffeine COMPARISON (this vs. that).
+Compare two related things and reveal a surprising difference or similarity.
+Examples: espresso vs. drip coffee, Arabica vs. Robusta, cold brew vs. iced coffee.
+Keep it to 2-3 sentences max.
+
+PREVIOUSLY USED (do NOT repeat or closely paraphrase):
+{history}
+
+Reply with ONLY the comparison text, nothing else.""",
+
+    "coffee_shop": """You are the content writer for "{channel}", a viral YouTube Shorts channel.
+
+Recommend an interesting, unique COFFEE SHOP from anywhere in the world.
+Include the shop name, city/country, and what makes it special or worth visiting.
+Make it sound like a must-visit destination. Keep it to 1-2 sentences.
+
+PREVIOUSLY USED (do NOT repeat or closely paraphrase):
+{history}
+
+Reply with ONLY the recommendation text, nothing else.""",
+}
 
 
 def load_state() -> dict:
-    """Load persistent state (episode counter, used indices)."""
+    """Load persistent state (episode counter, history)."""
     if STATE_FILE.exists():
         return json.loads(STATE_FILE.read_text())
-    return {
-        "episode": 0,
-        "used_facts": [],       # indices into FACTS that have been used
-        "used_shops": [],       # indices into COFFEE_SHOPS that have been used
-    }
+    return {"episode": 0, "history": []}
 
 
 def save_state(state: dict) -> None:
@@ -27,23 +97,36 @@ def save_state(state: dict) -> None:
     STATE_FILE.write_text(json.dumps(state, indent=2))
 
 
-def pick_from_bank(bank: list[str], used_key: str, state: dict) -> str:
-    """
-    Pick a random unused item from the bank. If all items have been used,
-    reset the used list and start over (shuffled fresh).
-    """
-    used = set(state.get(used_key, []))
-    available = [i for i in range(len(bank)) if i not in used]
+def generate_content(content_type: str, history: list[str]) -> str:
+    """Call MiniMax API to generate fresh content."""
+    client = OpenAI(
+        api_key=MINIMAX_API_KEY,
+        base_url=MINIMAX_BASE_URL,
+    )
 
-    if not available:
-        # All items used — reset and start fresh cycle
-        state[used_key] = []
-        available = list(range(len(bank)))
-        print(f"[ContentGen] Cycled through all items in bank, starting fresh.")
+    recent = history[-40:]
+    history_block = "\n".join(f"- {h}" for h in recent) if recent else "(none yet)"
 
-    choice = random.choice(available)
-    state.setdefault(used_key, []).append(choice)
-    return bank[choice]
+    prompt = PROMPTS[content_type].format(
+        channel=CHANNEL_NAME,
+        history=history_block,
+    )
+
+    response = client.chat.completions.create(
+        model=MINIMAX_MODEL,
+        max_tokens=250,
+        temperature=0.9,
+        messages=[
+            {"role": "system", "content": (
+                "You are a creative content writer for a coffee-themed YouTube Shorts channel. "
+                "Your content should be accurate, surprising, and highly shareable. "
+                "Never include hashtags, emojis, or meta-commentary. Just the content."
+            )},
+            {"role": "user", "content": prompt},
+        ],
+    )
+
+    return response.choices[0].message.content.strip()
 
 
 def run() -> dict:
@@ -52,21 +135,26 @@ def run() -> dict:
     state["episode"] += 1
     episode = state["episode"]
 
-    is_coffee_shop = (episode % COFFEE_SHOP_INTERVAL == 0)
-    content_type = "coffee_shop" if is_coffee_shop else "fact"
+    # Determine content type from rotation
+    rotation_index = (episode - 1) % len(CONTENT_ROTATION)
+    content_type = CONTENT_ROTATION[rotation_index]
 
-    if is_coffee_shop:
-        text = pick_from_bank(COFFEE_SHOPS, "used_shops", state)
-        header = "COFFEE SHOP SPOTLIGHT"
-    else:
-        text = pick_from_bank(FACTS, "used_facts", state)
-        header = "DID YOU KNOW THAT..."
+    # Generate content
+    text = generate_content(content_type, state.get("history", []))
+    state.setdefault("history", []).append(text)
+
+    # Keep history from growing forever (last 200)
+    if len(state["history"]) > 200:
+        state["history"] = state["history"][-200:]
+
+    config = CONTENT_CONFIG[content_type]
 
     episode_data = {
         "episode": episode,
         "type": content_type,
         "text": text,
-        "header": header,
+        "header": config["header"],
+        "title_prefix": config["title_prefix"],
     }
 
     # Save episode JSON
