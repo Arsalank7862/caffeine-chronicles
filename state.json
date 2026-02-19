@@ -1,8 +1,11 @@
 {
-  "episode": 2,
+  "episode": 3,
   "used_facts": [
     179,
     182
   ],
-  "used_shops": []
+  "used_shops": [],
+  "history": [
+    ""
+  ]
 }
