@@ -127,16 +127,44 @@ def generate_content(content_type: str, history: list[str]) -> str:
             {"role": "system", "content": (
                 "You are a creative content writer for a coffee-themed YouTube Shorts channel. "
                 "Your content should be accurate, surprising, and highly shareable. "
-                "Never include hashtags, emojis, or meta-commentary. Just the content."
+                "Never include hashtags, emojis, or meta-commentary. Just the content. "
+                "Do NOT use any thinking or reasoning tags. Reply with the final answer only."
             )},
             {"role": "user", "content": prompt},
         ],
+        extra_body={"reasoning_split": True},  # separates thinking from answer
     )
 
-    text = response.choices[0].message.content.strip()
+    text = (response.choices[0].message.content or "").strip()
 
-    # Strip MiniMax's <think>...</think> reasoning tags if present
+    # Strip any leftover <think>...</think> tags just in case
     text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
+
+    # If text is still empty, try to extract answer from reasoning
+    if not text:
+        # Try reasoning_details field
+        reasoning = getattr(response.choices[0].message, "reasoning_details", None)
+        if reasoning and isinstance(reasoning, list):
+            raw = reasoning[0].get("text", "") if isinstance(reasoning[0], dict) else str(reasoning[0])
+        else:
+            raw = ""
+        # Also check raw content before stripping
+        raw_content = (response.choices[0].message.content or "")
+        full_text = raw or raw_content
+
+        # Try to find the actual answer - look for quoted text or last sentence
+        quoted = re.findall(r'"([^"]{20,})"', full_text)
+        if quoted:
+            text = quoted[-1]
+        else:
+            # Grab the last substantial sentence
+            sentences = [s.strip() for s in re.split(r'[.!?]\s', full_text) if len(s.strip()) > 20]
+            if sentences:
+                text = sentences[-1].rstrip(".!?") + "."
+
+    if not text:
+        text = "Coffee is the world's most popular psychoactive substance, consumed by billions daily."
+        print("[ContentGen] WARNING: Used fallback fact — API returned empty content.")
 
     # Remove any stray quotes wrapping the response
     if text.startswith('"') and text.endswith('"'):
