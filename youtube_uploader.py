@@ -84,13 +84,20 @@ def upload_video(video_path: Path, episode_data: dict) -> str:
     # Build title from content type
     title_prefix = episode_data.get("title_prefix", "Coffee Fact")
     # Grab a short snippet of the fact for a unique title
-    snippet = fact_text.split(".")[0].split(",")[0].strip()
-    if len(snippet) > 60:
-        snippet = snippet[:57] + "..."
+    # Strip any leftover tags or weird characters
+    clean_text = fact_text.replace("<", "").replace(">", "")
+    snippet = clean_text.split(".")[0].split(",")[0].strip()
+    if len(snippet) > 55:
+        snippet = snippet[:52] + "..."
+    # Fallback if snippet is empty or too short
+    if len(snippet) < 5:
+        snippet = "You Won't Believe This"
     title = f"{title_prefix}: {snippet} #shorts"
 
-    # YouTube Shorts titles must be ≤100 chars
-    title = title[:100]
+    # YouTube Shorts titles must be ≤100 chars and not empty
+    title = title[:100].strip()
+    if not title:
+        title = "Caffeine Chronicles #shorts"
 
     description = YOUTUBE_DESCRIPTION_TEMPLATE.format(fact=fact_text)
 

@@ -5,6 +5,7 @@ Rotates through content categories: facts, myth busters, comparisons,
 and coffee shop recommendations.
 """
 import json
+import re
 import random
 from pathlib import Path
 from openai import OpenAI
@@ -132,7 +133,16 @@ def generate_content(content_type: str, history: list[str]) -> str:
         ],
     )
 
-    return response.choices[0].message.content.strip()
+    text = response.choices[0].message.content.strip()
+
+    # Strip MiniMax's <think>...</think> reasoning tags if present
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
+
+    # Remove any stray quotes wrapping the response
+    if text.startswith('"') and text.endswith('"'):
+        text = text[1:-1].strip()
+
+    return text
 
 
 def run() -> dict:
