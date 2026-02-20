@@ -78,12 +78,13 @@ def upload_video(video_path: Path, episode_data: dict) -> str:
     youtube = get_authenticated_service()
 
     episode = episode_data["episode"]
-    fact_text = episode_data["text"]
+    texts = episode_data.get("texts", [episode_data.get("text", "")])
+    fact_text = texts[0] if texts else ""
     content_type = episode_data.get("type", "fact")
 
     # Build title from content type
     title_prefix = episode_data.get("title_prefix", "Coffee Fact")
-    # Grab a short snippet of the fact for a unique title
+    # Grab a short snippet of the first fact for a unique title
     # Strip any leftover tags or weird characters
     clean_text = fact_text.replace("<", "").replace(">", "")
     snippet = clean_text.split(".")[0].split(",")[0].strip()
@@ -99,7 +100,9 @@ def upload_video(video_path: Path, episode_data: dict) -> str:
     if not title:
         title = "Caffeine Chronicles #shorts"
 
-    description = YOUTUBE_DESCRIPTION_TEMPLATE.format(fact=fact_text)
+    # Build description with all facts listed
+    all_facts = "\n".join(f"☕ {t}" for t in texts if t)
+    description = YOUTUBE_DESCRIPTION_TEMPLATE.format(fact=all_facts)
 
     body = {
         "snippet": {

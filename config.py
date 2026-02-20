@@ -31,12 +31,15 @@ CONTENT_ROTATION = [
     "coffee_shop",    # Day 7: coffee shop recommendation
 ]
 
+FACTS_PER_VIDEO = 3  # number of facts/items shown per video
+
 # ── Video Settings ───────────────────────────────────────────────────────────
 VIDEO_WIDTH = 1080
 VIDEO_HEIGHT = 1920
 FPS = 30
-VIDEO_DURATION_SECONDS = 35  # total video length
-TEXT_ANIMATE_IN_SECONDS = 2.0  # how long the text fade-in takes
+VIDEO_DURATION_SECONDS = 36  # total video length (12s per fact × 3 facts)
+SCENE_DURATION_SECONDS = 12.0  # time each fact is shown
+FADE_DURATION_SECONDS = 1.5  # fade in/out time for each scene
 BACKGROUND_MUSIC_FILE = ASSETS_DIR / "background_music.mp3"
 
 # ── YouTube Settings ─────────────────────────────────────────────────────────
