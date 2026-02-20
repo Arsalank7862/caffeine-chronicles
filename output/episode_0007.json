@@ -1,17 +1,12 @@
 {
   "episode": 7,
-  "used_facts": [
-    179,
-    182
-  ],
-  "used_shops": [],
-  "history": [
-    "",
-    " comes from the Arabic ",
-    "A shot of espresso has 63mg of caffeine while a typical 8oz cup of drip coffee has 95mg. Despite espresso feeling stronger, you're actually getting more caffeine from your morning coffee maker. The small serving size just makes it feel like a punch.",
-    "Coffee plants produce caffeine as a natural pesticide to paralyze and kill insects that try to eat the leaves and cherries.",
+  "type": "coffee_shop",
+  "texts": [
     "The Coffee Collective - Copenhagen, Denmark - Pioneered the \"natural process\" coffee method and won multiple barista championships, serving nitrogen-infused cold brew from sleek copper tanks.",
     "Fika Coffee - Kyoto, Japan - Located in a 120-year-old traditional machiya townhouse, they serve pour-over coffee alongside matcha in an intimate setting.",
     "Blue Bottle Coffee - Los Angeles, USA - Inside a historic warehouse indtown, this specialty roaster serves single-origin pour-overs while you watch beans being roasted on a custom Probat roaster."
-  ]
+  ],
+  "text": "The Coffee Collective - Copenhagen, Denmark - Pioneered the \"natural process\" coffee method and won multiple barista championships, serving nitrogen-infused cold brew from sleek copper tanks.",
+  "header": "COFFEE SHOP SPOTLIGHT",
+  "title_prefix": "Coffee Shop You Need to Visit"
 }
