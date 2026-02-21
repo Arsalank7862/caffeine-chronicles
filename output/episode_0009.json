@@ -1,0 +1,12 @@
+{
+  "episode": 9,
+  "type": "fact",
+  "texts": [
+    "Green coffee beans aren't actually green \u2014 they're pale grayish-green; the brown color we associate with coffee only appears after roasting.",
+    "Decaf coffee isn't caffeine-free \u2014 it still contains 2-15mg per cup, meaning drinking 5-10 cups of decaf gives you the same caffeine as one cup of regular coffee.",
+    "The world's most expensive coffee, Kopi Luwak, is made after palm civets eat coffee cherries and excrete the digested beans \u2014 collectors then retrieve and clean them."
+  ],
+  "text": "Green coffee beans aren't actually green \u2014 they're pale grayish-green; the brown color we associate with coffee only appears after roasting.",
+  "header": "DID YOU KNOW?",
+  "title_prefix": "Coffee Facts"
+}
