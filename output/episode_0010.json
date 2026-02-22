@@ -1,0 +1,12 @@
+{
+  "episode": 10,
+  "type": "myth_buster",
+  "texts": [
+    "MYTH: Coffee dehydrates you. TRUTH: Despite being a mild diuretic, the water in your coffee more than compensates. Studies show regular coffee consumption contributes to daily hydration just like any other beverage.",
+    "MYTH: Coffee stunts your growth. TRUTH: This myth originated from flawed 20th century studies that confused caffeine's effect on bone calcium with growth. Modern science shows no link between coffee consumption and stunted human growth.",
+    "MYTH: You need to drink coffee daily to get its health benefits. TRUTH: Research shows the antioxidants and beneficial compounds in coffee work even with occasional consumption. You don't need to be a daily drinker to reap coffee's potential health benefits."
+  ],
+  "text": "MYTH: Coffee dehydrates you. TRUTH: Despite being a mild diuretic, the water in your coffee more than compensates. Studies show regular coffee consumption contributes to daily hydration just like any other beverage.",
+  "header": "MYTH vs. REALITY",
+  "title_prefix": "Coffee Myth Busted"
+}
