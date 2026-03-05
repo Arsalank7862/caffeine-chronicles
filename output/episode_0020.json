@@ -1,0 +1,12 @@
+{
+  "episode": 20,
+  "type": "fact",
+  "texts": [
+    "Coffee plants are genetically identical clones \u2014 every Arabica plant worldwide essentially comes from a single ancestor bred in the 1600s, meaning all specialty coffee is grown from the same 300-year-old genetic line.",
+    "Espresso contains less caffeine per ounce than regular coffee \u2014 the short brew time extracts only about 63mg per ounce compared to drip coffee's 95mg, yet the concentrated flavor makes it feel stronger.",
+    "Spent coffee grounds still contain 3-5% of their original caffeine \u2014 enough to keep you buzzing, which is why some municipalities have tested using them as natural pesticide in golf courses."
+  ],
+  "text": "Coffee plants are genetically identical clones \u2014 every Arabica plant worldwide essentially comes from a single ancestor bred in the 1600s, meaning all specialty coffee is grown from the same 300-year-old genetic line.",
+  "header": "DID YOU KNOW?",
+  "title_prefix": "Coffee Facts"
+}
